@@ -33,7 +33,17 @@ Run:
 
     $ docker-compose -f dev-docker-compose.yml up -d
 
-Note: You need to start the containers in detached mode using the *-d* flag
+Note: a) You need to start the containers in detached mode using the *-d* flag
+      b) When you build the maven project , remember to configure the correct host for the database. Change the persistence.jdbc.url attribute
+      
+from
+
+    <persistence.jdbc.url>jdbc:postgresql://localhost:5432/aqrsystem</persistence.jdbc.url>    
+
+to
+
+    <persistence.jdbc.url>jdbc:postgresql://DB:5432/aqrsystem</persistence.jdbc.url>
+      
 
 ### Initialize database with data
 
