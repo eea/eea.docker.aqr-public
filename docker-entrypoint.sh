@@ -4,7 +4,7 @@
 #: Imports EuropeanCommission and CommisSign certificates, configures tomcat ECAS Authenticator, deploys the war.
 #: 
 
-set -ex
+set -e
 
 BEANS_XML_URL="https://raw.githubusercontent.com/eea/aqr-public/master/ServerConfiguration/ecas/tomcat/org/apache/catalina/authenticator/mbeans-descriptors.xml"
 
@@ -68,7 +68,7 @@ EUROCOM_CERT_SHA1_FROM_FILE=$(sha1sum /tmp/certs/EuropeanCommission.cer | awk '{
 COMMISSIGN_CERT_SHA1_FROM_FILE=$(sha1sum /tmp/certs/EuropeanCommission.cer | awk '{print $1}')
 
 # Check if the certificates are corrupted or invalid.
-if [ "${EUROCOM_CERT_SHA1_FROM_FILE}" -eq "${EUROCOM_CERT_SHA1_DEFAULT}" ] && [ "${COMMISSIGN_CERT_SHA1_FROM_FILE}" -eq "${COMMISSIGN_CERT_SHA1_DEFAULT}" ]; then
+if [ "${EUROCOM_CERT_SHA1_FROM_FILE}" = "${EUROCOM_CERT_SHA1_DEFAULT}" ] && [ "${COMMISSIGN_CERT_SHA1_FROM_FILE}" = "${COMMISSIGN_CERT_SHA1_DEFAULT}" ]; then
 	printf "Invalid sha1sum for certificates trying to import.\n"
 	exit 1
 fi
@@ -83,25 +83,23 @@ if [ -d "${CATALINA_HOME}/webapps/ROOT" ]; then
 	rm -rf ${CATALINA_HOME}/webapps/ROOT
 fi
 
-# If url is provided, download from url.
-# If no url is provided, we assume that the war file is somehow injected to /tmp/ROOT.war using data container
-if [ -n "${url}" ]; then
-	# Authentication is required to download the war file.
-	if [ -n "${user}" ] && [ -n "${password}" ]; then
-		curl -L -u "${user}:${password}" "${url}" > /tmp/ROOT.war
+if [ -n "$CURL_URL" ]; then
+	if [ -n "$CURL_USER"] && [ -n "$CURL_PASSWORD" ]; then
+		curl -o $WAR_FILEPATH -u "${CURL_USER}:${CURL_PASSWORD}" "$CURL_URL"
 	else
-		# No authentication
-		curl -L "${url}" > /tmp/ROOT.war
+		curl -o $WAR_FILEPATH "$CURL_URL"
 	fi
+	
 fi
 
 # Check if war file exists
-if [ ! -f /tmp/ROOT.war ]; then
-	printf "Couldn't find the war file in /tmp directory.\n"
+if [ ! -f "$WAR_FILEPATH" ]; then
+	printf "Couldn't find the war file in %s\n" "$WAR_FILEPATH"
+	ls -la $WAR_FILEPATH
 	exit 1
 fi
 
-cp /tmp/ROOT.war $CATALINA_HOME/webapps/ROOT.war
+cp ${WAR_FILEPATH} $CATALINA_HOME/webapps/ROOT.war
 
 # Run tomcat server
 ${CATALINA_HOME}/bin/catalina.sh run
