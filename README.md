@@ -6,64 +6,67 @@
 2. Install [Docker Compose](https://docs.docker.com/compose/).
 
 ### Download
+3.Clone the repository from github:
+
     $ git clone https://github.com/eea/eea.docker.aqr-public
     $ cd eea.docker.aqr-public
 
-## Development
 
-    $ cp .secret.backup .secret
+## Database container
 
-Edit the *.secret* file and provide postgresql credentials:
+4.Create a data container for the postgresql database service
+	
+	$ docker run --name dbdata -v /var/lib/postgresql/data busybox
+
+
+5.Create a file named *.secret* which contains the database credentials. Example:
     
     POSTGRES_USER=aqrsystem
     POSTGRES_PASSWORD=aqrsystem
     POSTGRES_DB=aqrsystem
 
-If the war file is located at */home/user/project/aqr-public/SourceCode/aqrsystem/target/aqrsystem.war* then edit the dev-docker-compose.yml file and change the line:
 
-    /path/to/aqrsystem.war:/tmp/ROOT.war
+6.Create a database container:
+
+	$ docker run -d --name postresqldb --volumes-from dbdata --env-file .secret postgres:9.3
+
+The database container is up and running.
+
+## Import data
+7.Import sql data and initialize the database:
+
+	$ docker run -v /host/path/to/create_aqd.sql:/data.sql -t --rm  --link postresqldb:dbserver postgres:9.3 bash -c 'PGPASSWORD=dbpass psql -h dbserver -p 5432 -U dbuser -d dbname < /data.sql'
+	
+	$ docker run -v /host/path/to/insert_aqd.sql:/data.sql -t --rm --link postresqldb:dbserver postgres:9.3 bash -c 'PGPASSWORD=dbpass psql -h dbserver -p 5432 -U dbuser -d dbname < /data.sql'	
+	
+	$ docker run -v /host/path/to/UK_demos.sql:/data.sql -t --rm  --link postresqldb:dbserver postgres:9.3 bash -c 'PGPASSWORD=dbpass psql -h dbserver -p 5432 -U dbuser -d dbname < /data.sql'	
+
+
+*Note: dbuser, dbpass, dbname should match the values POSTGRESQL_USERNAME, POSTGRESQL_PASS, POSTGRESQL_DB declared in the .secret file.*
+
+## Web app container
+
+10.Create a data container that will store the log files for the web server
+	
+	$ docker run --name webappdatacontainer -v /usr/local/tomcat/logs -v /var/log/aqrsystem busybox
+
+
+11.If the war file that you want to deploy is located on your filesystem then:
+	
+	$ docker run --name warcontainer -v /path/to/aqrsystem.war:/tmp/ROOT.war busybox
+
+
+### Override persistence.xml and ecas-config.properties file
+
+
+	$ docker run --name warcontainer -v /tmp -v /path/to/aqrsystem.war:/aqrsystem.war -v /path/to/ecas-config.properties:/tmp/WEB-INF/classes/ecas-config.properties -v /path/to/persistence.xml:/tmp/WEB-INF/classes/META-INF/persistence.xml java:7 sh -c 'cp /aqrsystem.war /tmp/ROOT.war && cd /tmp && jar -uf ROOT.war WEB-INF/classes/ecas-config.properties WEB-INF/classes/META-INF/persistence.xml'
+
+
+## Run the web app container
+	
+	$ docker run --name aqrsystemserver -p 8080:8080 --volumes-from webappdatacontainer --volumes-from warcontainer --link postresqldb:DB_HOST eeacms/aqr-public
+	
+
+*Note: In the persistence.xml file, the database IP Adress should match the docker container alias (DB_HOST)*
     
-to
-
-    /home/user/project/aqr-public/SourceCode/aqrsystem/target/aqrsystem.war:/tmp/ROOT.war
-
-### Start the containers
-
-Run:
-
-    $ docker-compose -f dev-docker-compose.yml up -d
-
-Note: a) You need to start the containers in detached mode using the *-d* flag
-      b) When you build the maven project , remember to configure the correct host for the database. Change the persistence.jdbc.url attribute
-      
-from
-
-    <persistence.jdbc.url>jdbc:postgresql://localhost:5432/aqrsystem</persistence.jdbc.url>    
-
-to
-
-    <persistence.jdbc.url>jdbc:postgresql://DB:5432/aqrsystem</persistence.jdbc.url>
-      
-
-### Initialize database with data
-
-Run:
-
-    $ docker exec -t eeadockeraqrpublic_database_1 psql -U aqrsystem -d aqrsystem -f /tmp/postgres_init_db_files/create_aqd.sql 
-    $ docker exec -t eeadockeraqrpublic_database_1 psql -U aqrsystem -d aqrsystem -f /tmp/postgres_init_db_files/insert_aqd.sql
-    $ docker exec -t eeadockeraqrpublic_database_1 psql -U aqrsystem -d aqrsystem -f /tmp/postgres_init_db_files/UK_demos.sql
-
-
-Open your browser and go to *http://localhost:8080*
-
-## Production
-
-Provide the URL of the war file:
-
-    $ docker run -p 80:8080 -d -e url=http://..../aqrsystem.war eeacms/aqr-public
-    
-If credentials are required to access the war file, run:
-
-    $ docker run -p 80:8080 -d -e user=jane -e password=secret -e url=http://..../aqrsystem.war eeacms/aqr-public
-    
-    
+    $ <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://DB_HOST:5432/dbname"/>
