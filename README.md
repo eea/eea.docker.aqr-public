@@ -1,18 +1,23 @@
 ## AQ e-Reporting ready to run docker image
 
 
-### Installation process
+## Installation process
 1. Install [Docker](https://www.docker.com).
 2. Install [Docker Compose](https://docs.docker.com/compose/).
 
-### Download
+## Download
 3.Clone the repository from github:
 
     $ git clone https://github.com/eea/eea.docker.aqr-public
     $ cd eea.docker.aqr-public
 
+## Production deployment
 
-## Database container
+Deployment for production is in the aqrsystem directory. You use docker-compose.
+
+## Development deployment
+
+### Database container
 
 4.Create a data container for the postgresql database service
 	

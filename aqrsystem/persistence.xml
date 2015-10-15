@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2010-2014 EUROPEAN UNION
+ Licensed under the EUPL, Version 1.1 or - as soon they will be approved by
+ the European Commission - subsequent versions of the EUPL (the "Licence");
+ You may not use this work except in compliance with the Licence.
+ You may obtain a copy of the Licence at: 
+ http://ec.europa.eu/idabc/eupl
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the Licence is distributed on an "AS IS" basis,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the Licence for the specific language governing permissions and
+ limitations under the Licence.
+ 
+ Date: __/__/____
+ Authors: European Commission, Joint Research Centre
+ Daniele Francioli, Emanuela Epure, Lukasz Cyra
+ aq-dev@jrc.ec.europa.eu
+-->
+
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="Aqrsystem" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    
+    <class>eu.europa.ec.aqrmodel.Adjustmentsource</class>
+    <class>eu.europa.ec.aqrmodel.Adjustmenttype</class>
+    <class>eu.europa.ec.aqrmodel.Administrationlevel</class>
+    <class>eu.europa.ec.aqrmodel.Areaclassification</class>
+    <class>eu.europa.ec.aqrmodel.Assesmentmethods</class>
+    <class>eu.europa.ec.aqrmodel.Assesmenttype</class>
+    <class>eu.europa.ec.aqrmodel.Attainment</class>
+    <class>eu.europa.ec.aqrmodel.Classification</class>
+    <class>eu.europa.ec.aqrmodel.Costs</class>
+    <class>eu.europa.ec.aqrmodel.Currency</class>
+    <class>eu.europa.ec.aqrmodel.Deductionassessmentmethod</class>
+    <class>eu.europa.ec.aqrmodel.Environmentalobjective</class>
+    <class>eu.europa.ec.aqrmodel.Evaluationscenario</class>
+    <class>eu.europa.ec.aqrmodel.Exceedancearea</class>
+    <class>eu.europa.ec.aqrmodel.Exceedancedescription</class>
+    <class>eu.europa.ec.aqrmodel.Exceedanceexposure</class>
+    <class>eu.europa.ec.aqrmodel.Expectedimpact</class>
+    <class>eu.europa.ec.aqrmodel.Localincrement</class>
+    <class>eu.europa.ec.aqrmodel.Measures</class>
+    <class>eu.europa.ec.aqrmodel.Measuretype</class>
+    <class>eu.europa.ec.aqrmodel.Plan</class>
+    <class>eu.europa.ec.aqrmodel.Plannedimplementation</class>
+    <class>eu.europa.ec.aqrmodel.Pollutant</class>
+    <class>eu.europa.ec.aqrmodel.Protectiontarget</class>
+    <class>eu.europa.ec.aqrmodel.Publication</class>
+    <class>eu.europa.ec.aqrmodel.Quantificationnumerical</class>
+    <class>eu.europa.ec.aqrmodel.Reasonvalue</class>
+    <class>eu.europa.ec.aqrmodel.Regionalbackground</class>
+    <class>eu.europa.ec.aqrmodel.Relatedparty</class>
+    <class>eu.europa.ec.aqrmodel.Scenario</class>
+    <class>eu.europa.ec.aqrmodel.Sourceapportionment</class>
+    <class>eu.europa.ec.aqrmodel.Sourcesector</class>
+    <class>eu.europa.ec.aqrmodel.Spatialscale</class>
+    <class>eu.europa.ec.aqrmodel.Specificationofhours</class>
+    <class>eu.europa.ec.aqrmodel.Statusplan</class>
+    <class>eu.europa.ec.aqrmodel.Statusplannedimplementation</class>
+    <class>eu.europa.ec.aqrmodel.Timescale</class>
+    <class>eu.europa.ec.aqrmodel.Urbanbackground</class>
+    
+    
+    <class>eu.europa.ec.aqrcrosstablesmodel.AttainmentPlan</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.DeductionassessmentmethodAdjustmentsource</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.DeductionassessmentmethodAssesmentmethods</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.EvaluationscenarioPublication</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.ExceedancedescriptionReasonvalue</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.ExceedenceareaAreaclassification</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.MeasuresAdministrationlevel</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.MeasuresClassification</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.MeasuresEvaluationscenario</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.MeasuresScenario</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.MeasuresSourcesector</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.MeasuresSpatialscale</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.PlanPollutantProtectiontarget</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.PlanPublication</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.PollutantProtectiontarget</class>
+    <class>eu.europa.ec.aqrcrosstablesmodel.SourceapportionmentMeasures</class>
+    
+    
+    <class>eu.europa.ec.aqrdatabasechangelog.Databasechangelog</class>
+    <class>eu.europa.ec.aqrdatabasechangelog.Databasechangeloglock</class>
+    
+    <class>eu.europa.ec.aqrmodeluser.Systemconfiguration</class>
+    <class>eu.europa.ec.aqrmodeluser.Country</class>
+    <class>eu.europa.ec.aqrmodeluser.Users</class>
+    <class>eu.europa.ec.aqrmodeluser.Userrole</class>
+    
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://DB_HOST:5432/aqrsystem"/>
+      <property name="javax.persistence.jdbc.password" value="aqrsystemsecret"/>
+      <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+      <property name="javax.persistence.jdbc.user" value="aqrsystem"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="eclipselink.logging.level" value="OFF"/>
+    </properties>
+  </persistence-unit>
+</persistence>

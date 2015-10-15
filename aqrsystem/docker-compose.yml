@@ -1,0 +1,64 @@
+#
+# Persistent files for Postgres
+# Note that you'll have to manually inject the database files.
+# To do so you create postgres alone with:
+#    docker-compose -d up postgresqldata postgres
+#    docker-compose stop postgres
+#
+postgresqldata:
+    image: busybox
+    volumes:
+        - /etc/postgresql
+        - /var/log/postgresql
+        - /var/lib/postgresql
+
+#
+# Start the Postgres Service
+#
+postgres:
+    image: postgres:9.3
+    env_file:
+        - .secret
+    volumes_from:
+        - postgresqldata
+#   volumes:
+#       - data/:/etc/aqrinitdata/
+
+#
+# Persistent files for Tomcat
+#
+tomcatdata:
+    image: busybox
+    volumes:
+        - /var/log/aqrsystem
+        - /usr/local/tomcat/logs
+
+#
+# Modify the WAR file by injecting configuration
+# When deploying updates, download aqrsystem.war from
+# http://ci.eionet.europa.eu/view/Java/job/AQRSystem/lastSuccessfulBuild/artifact/SourceCode/aqrsystem/target/aqrsystem.war
+#
+warcontainer:
+    image: java:7
+    volumes:
+        - /tmp
+        - ./aqrsystem.war:/aqrsystem.war
+        - ./ecas-config.properties:/tmp/WEB-INF/classes/ecas-config.properties
+        - ./persistence.xml:/tmp/WEB-INF/classes/META-INF/persistence.xml
+    command: sh -c 'cp /aqrsystem.war /tmp/ROOT.war && cd /tmp && jar -uf ROOT.war WEB-INF/classes/ecas-config.properties WEB-INF/classes/META-INF/persistence.xml'
+
+#
+# Start the Tomcat application
+#
+tomcat:
+    ports:
+        - "80:8080"
+    image: eeacms/aqr-public
+    links: 
+        - postgres:DB_HOST
+    volumes_from:
+        - warcontainer
+        - tomcatdata
+#   volumes:
+#       - ./aqrsystem.war:/tmp/ROOT.war
+
