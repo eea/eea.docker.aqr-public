@@ -16,6 +16,7 @@ postgresqldata:
 # Start the Postgres Service
 #
 postgres:
+    restart: always
     image: postgres:9.3
     env_file:
         - .secret
@@ -50,8 +51,9 @@ warcontainer:
 
 #
 # Start the Tomcat application
-#
+# Image is at https://hub.docker.com/r/eeacms/aqr-public/
 tomcat:
+    restart: always
     ports:
         - "51080:8080"
     image: eeacms/aqr-public
