@@ -21,7 +21,8 @@ postgres:
         - .secret
     volumes_from:
         - postgresqldata
-#   volumes:
+    volumes:
+        - /etc/localtime:/etc/localtime:ro # Share timezone data with host
 #       - data/:/etc/aqrinitdata/
 
 #
@@ -52,13 +53,14 @@ warcontainer:
 #
 tomcat:
     ports:
-        - "80:8080"
+        - "51080:8080"
     image: eeacms/aqr-public
     links: 
         - postgres:DB_HOST
     volumes_from:
         - warcontainer
         - tomcatdata
-#   volumes:
+    volumes:
+        - /etc/localtime:/etc/localtime:ro # Share timezone data with host
 #       - ./aqrsystem.war:/tmp/ROOT.war
 
