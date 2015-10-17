@@ -14,7 +14,7 @@ postgresqldata:
     volumes:
         - /etc/postgresql
         - /var/log/postgresql
-        - /var/lib/postgresql/data
+        - /var/local/aqrsystem/postgresqldata:/var/lib/postgresql/data
 
 #
 # Start the Postgres Service
