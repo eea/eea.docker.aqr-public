@@ -1,0 +1,56 @@
+#
+# Persistent files for Postgres
+# Note that you'll have to manually inject the database files.
+# To do so you create postgres alone with:
+#    docker-compose up -d postgresqldata postgres
+#    docker-compose stop postgres
+
+#
+# Container for postgres data. Note that the postgres:9.3 image defines a /var/lib/postgresql/data volume
+# we must match.
+#
+postgresqldata:
+    image: busybox
+    volumes:
+        - /etc/postgresql
+        - /var/log/postgresql
+        - /var/local/aqrsystem/postgresqldata:/var/lib/postgresql/data
+
+#
+# Start the Postgres Service
+#
+postgres:
+    restart: always
+    image: postgres:9.3
+    env_file:
+        - .secret
+    volumes_from:
+        - postgresqldata
+    volumes:
+        - /etc/localtime:/etc/localtime:ro # Share timezone data with host
+
+
+#
+# Persistent files for Tomcat
+#
+tomcatdata:
+    image: busybox
+    volumes:
+        - /var/log/aqrsystem
+        - /usr/local/tomcat/logs
+
+
+#
+# Start the Tomcat application
+# Image is at https://hub.docker.com/r/eeacms/aqr-public/
+tomcat:
+    restart: always
+    ports:
+        - "51080:8080"
+    image: eeacms/aqr-public
+    links: 
+        - postgres:DB_HOST
+    volumes_from:
+        - tomcatdata
+    volumes:
+        - /etc/localtime:/etc/localtime:ro # Share timezone data with host
