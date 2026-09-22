@@ -1,7 +1,7 @@
 #!/bin/bash
 #: File: docker-entrypoint.sh
 #: Description: 
-#: Imports EuropeanCommission and CommisSign certificates, configures tomcat ECAS Authenticator, deploys the war.
+#: Imports EuropeanCommission, CommisSign and GlobalSign certificates, configures tomcat ECAS Authenticator, deploys the war.
 #: 
 
 set -e
@@ -46,11 +46,13 @@ sed -i 's#<Realm className="org.apache.catalina.realm.UserDatabaseRealm"#<Realm 
 
 # URL location of the certificates
 EUROCOM_CERT_URL="https://raw.githubusercontent.com/eea/aqr-public/master/ServerConfiguration/ecas/certs/CommisSign.cer"
-COMMISSIGN_CERT_URL="https://raw.githubusercontent.com/eea/aqr-public/master/ServerConfiguration/ecas/certs/EuropeanCommission.cer" 
+COMMISSIGN_CERT_URL="https://raw.githubusercontent.com/eea/aqr-public/master/ServerConfiguration/ecas/certs/EuropeanCommission.cer"
+GLOBALSIGN_CERT_URL="https://raw.githubusercontent.com/eea/aqr-public/master/ServerConfiguration/ecas/certs/GlobalSign.cer"
 
-# Expected SHA1 values for EUROPEANCOMMISSION and COMMISSIGN certificates
+# Expected SHA1 values for EUROPEANCOMMISSION, COMMISSIGN and GLOBALSIGN certificates
 EUROCOM_CERT_SHA1_DEFAULT="70a7c70604a20c0fedc704351637efb9ff298b4f"
 COMMISSIGN_CERT_SHA1_DEFAULT="b7e343a36e8bfbe5154250c1987f2efc6c396abb"
+GLOBALSIGN_CERT_SHA1_DEFAULT="53a2b04bca6bd645e6398a8ec40dd2bf77c3a290"
 
 
 # If cacert password hasn't changed, set to default value
@@ -62,13 +64,15 @@ fi
 mkdir -p /tmp/certs
 curl -L "${EUROCOM_CERT_URL}" > /tmp/certs/CommisSign.cer 
 curl -L "${COMMISSIGN_CERT_URL}" >/tmp/certs/EuropeanCommission.cer
+curl -L "${GLOBALSIGN_CERT_URL}" >/tmp/certs/GlobalSign.cer
 
 # Get the SHA1 from the certificates that we downloaded.
 EUROCOM_CERT_SHA1_FROM_FILE=$(sha1sum /tmp/certs/EuropeanCommission.cer | awk '{print $1}')
-COMMISSIGN_CERT_SHA1_FROM_FILE=$(sha1sum /tmp/certs/EuropeanCommission.cer | awk '{print $1}')
+COMMISSIGN_CERT_SHA1_FROM_FILE=$(sha1sum /tmp/certs/CommisSign.cer | awk '{print $1}')
+GLOBALSIGN_CERT_SHA1_FROM_FILE=$(sha1sum /tmp/certs/GlobalSign.cer | awk '{print $1}')
 
 # Check if the certificates are corrupted or invalid.
-if [ "${EUROCOM_CERT_SHA1_FROM_FILE}" = "${EUROCOM_CERT_SHA1_DEFAULT}" ] && [ "${COMMISSIGN_CERT_SHA1_FROM_FILE}" = "${COMMISSIGN_CERT_SHA1_DEFAULT}" ]; then
+if [ "${EUROCOM_CERT_SHA1_FROM_FILE}" = "${EUROCOM_CERT_SHA1_DEFAULT}" ] && [ "${COMMISSIGN_CERT_SHA1_FROM_FILE}" = "${COMMISSIGN_CERT_SHA1_DEFAULT}" ] && [ "${GLOBALSIGN_CERT_SHA1_FROM_FILE}" = "${GLOBALSIGN_CERT_SHA1_DEFAULT}" ]; then
 	printf "Invalid sha1sum for certificates trying to import.\n"
 	exit 1
 fi
@@ -76,6 +80,7 @@ fi
 # Import certificates
 keytool -import -noprompt -v -keystore cacerts -storepass ${KEYSTORE_PASS} -alias EuropeanCommission -file /tmp/certs/EuropeanCommission.cer
 keytool -import -noprompt -v -keystore cacerts -storepass ${KEYSTORE_PASS} -alias CommisSign -file /tmp/certs/CommisSign.cer
+keytool -import -noprompt -v -keystore cacerts -storepass ${KEYSTORE_PASS} -alias GlobalSign -file /tmp/certs/GlobalSign.cer
 
 
 # Delete the old Root directory
